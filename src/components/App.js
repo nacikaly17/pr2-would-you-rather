@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { handleInitialData } from '../actions/shared'
 import LoadingBar from 'react-redux-loading'
@@ -13,7 +13,18 @@ import VotingResult from './VotingResult'
 import LeaderBoard from './LeaderBoard'
 import Logout from './Logout'
 import NotFound from './NotFound';
+import { fakeAuth } from '../utils/helpers'
 
+const PrivateRoute = ({ component: Component, ...rest }) => (
+  <Route {...rest} render={(props) => (
+    fakeAuth.isAuthenticated === true
+      ? <Component {...props} />
+      : <Redirect to={{
+        pathname: '/',
+        state: { from: props.location }
+      }} />
+  )} />
+)
 
 class App extends Component {
 
@@ -28,25 +39,17 @@ class App extends Component {
           <LoadingBar />
           <Header />
           <div className='container'>
-            {this.props.loading === true
-              ? <div>
-                <Switch>
-                  <Route path='/' exact component={SignIn} />
-                  <Route path='/signup' exact component={SignUp} />
-                  <Route path='*' component={NotFound} />
-                </Switch>
-              </div>
-              : <div>
-                <Switch>
-                  <Route path='/' exact component={Dashboard} />
-                  <Route path='/questions/:question_id' component={QuestionPage} />
-                  <Route path='/add' component={NewQuestion} />
-                  <Route path='/votingResult/:id' component={VotingResult} />
-                  <Route path='/leaderboard' component={LeaderBoard} />
-                  <Route path='/logout' component={Logout} />
-                  <Route path='*' component={NotFound} />
-                </Switch>
-              </div>}
+            <Switch>
+              <Route path='/' exact component={SignIn} />
+              <Route path='/signup' exact component={SignUp} />
+              <Route path='/home' exact component={Dashboard} />
+              <PrivateRoute path='/questions/:question_id' component={QuestionPage} />
+              <PrivateRoute path='/add' component={NewQuestion} />
+              <PrivateRoute path='/votingResult/:id' component={VotingResult} />
+              <PrivateRoute path='/leaderboard' component={LeaderBoard} />
+              <Route path='/logout' component={Logout} />
+              <Route path='/*' component={NotFound} />
+            </Switch>
           </div>
         </Fragment>
       </Router>

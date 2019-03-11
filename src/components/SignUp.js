@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import logo from '../images/logo-thumb.png';
-import { Link } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
 import { Button } from 'reactstrap';
 import ImageInput from '../utils/ImageInput'
 import { handleSignUp } from '../actions/users'
-import { Redirect } from 'react-router-dom'
 import serializeForm from 'form-serialize'
 
 class SignUp extends Component {

@@ -27,9 +27,9 @@ class QuestionPage extends Component {
     handleSubmit = (e) => {
         e.preventDefault()
 
-        const { dispatch, question, loggedInUser } = this.props
+        const { dispatch, loggedInUser, id } = this.props
         dispatch(handleQuestionAnswer({
-            qid: question.id,
+            qid: id,
             answer: this.state.activeRadio,
             authedUser: loggedInUser
         }))
@@ -45,15 +45,26 @@ class QuestionPage extends Component {
 
     render() {
 
-        const { question } = this.props
-        const { toVotingResult } = this.state
+        const { questions, users, loggedInUser, id } = this.props
 
-        if (question === null) {
-            return <p>This Question doesn't exist</p>
+        if (this.props.loggedInUser === null) {
+            console.log("first login")
+            this.props.history.push('/')
+            return <Redirect to={`/`} />
         }
 
+        const qIds = Object.keys(this.props.questions)
+        const fqids = qIds.filter((c) => c === id)
+        if (fqids.length === 0) {
+            console.log("Page Not NotFound")
+            return <Redirect to={`/*`} />
+        }
+
+        const question = formatQuestion(questions[id], users, loggedInUser)
+
+        const { toVotingResult } = this.state
+
         const {
-            id,
             name,
             avatar,
             optionOneText,
@@ -101,8 +112,6 @@ class QuestionPage extends Component {
                         </div>
                     </div>
                 </div>
-
-
             </div>
         )
     }
@@ -110,13 +119,11 @@ class QuestionPage extends Component {
 
 function mapStateToProps({ loggedInUser, users, questions }, props) {
     const { question_id } = props.match.params
-    const question = questions[question_id]
     return {
         id: question_id,
         loggedInUser,
-        question: question
-            ? formatQuestion(question, users, loggedInUser)
-            : null
+        users,
+        questions,
     }
 }
 

@@ -3,7 +3,8 @@ import { connect } from 'react-redux'
 import { Dropdown, DropdownMenu, DropdownItem, DropdownToggle, Button } from 'reactstrap';
 import logo from '../images/logo-thumb.png';
 import { handleSignIn } from '../actions/loggedInUser'
-import { Link } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
+import { fakeAuth } from '../utils/helpers'
 
 class SignIn extends Component {
 
@@ -16,8 +17,17 @@ class SignIn extends Component {
         this.state = {
             dropdownOpen: false,
             value: "Select User",
+            redirectToReferrer: false
         };
 
+    }
+
+    login = () => {
+        fakeAuth.authenticate(() => {
+            this.setState(() => ({
+                redirectToReferrer: true
+            }))
+        })
     }
 
     toggle() {
@@ -37,14 +47,27 @@ class SignIn extends Component {
 
         e.preventDefault()
         const { dispatch } = this.props
+
+        fakeAuth.authenticate(() => {
+            this.setState(() => ({
+                redirectToReferrer: true
+            }))
+        })
+
         dispatch(handleSignIn(this.state.value))
 
     }
 
     render() {
 
-        const { dropdownOpen, value } = this.state
+        const { dropdownOpen, value, redirectToReferrer } = this.state
         const { userIds } = this.props
+
+        const { from } = this.props.location.state || { from: { pathname: '/home' } }
+
+        if (redirectToReferrer === true) {
+            return <Redirect to={from} />
+        }
 
         return (
             <div className='question-container center'>

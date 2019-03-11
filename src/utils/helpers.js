@@ -26,6 +26,7 @@ export function formatQuestion(question, users, loggedInUser) {
         totalVotes: votesForOptionOne + votesForOptionTwo,
     }
 }
+
 export function formatUser(users, uid) {
     const user = users[uid];
     const numberOfCreatedQuestions = user.questions.length
@@ -39,5 +40,17 @@ export function formatUser(users, uid) {
         numberOfCreatedQuestions,
         numberOfAnswers,
         score
+    }
+}
+
+export const fakeAuth = {
+    isAuthenticated: false,
+    authenticate(cb) {
+        this.isAuthenticated = true
+        setTimeout(cb, 100)
+    },
+    signout(cb) {
+        this.isAuthenticated = false
+        setTimeout(cb, 100)
     }
 }
